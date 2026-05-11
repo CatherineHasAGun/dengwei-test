@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "preflight": "npm run typecheck && npm run build",
     "start": "next start",
     "typecheck": "tsc --noEmit"
   },
