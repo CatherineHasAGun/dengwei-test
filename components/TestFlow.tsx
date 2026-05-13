@@ -20,7 +20,14 @@ import {
 } from "@/lib/testState";
 
 function readStoredState(): TestState {
-  return readTestState(questions.length);
+  const storedState = readTestState(questions.length);
+
+  if (hasCompletedTest(storedState.answers, questions.length)) {
+    clearTestState();
+    return initialTestState;
+  }
+
+  return storedState;
 }
 
 function persistState(state: TestState) {
