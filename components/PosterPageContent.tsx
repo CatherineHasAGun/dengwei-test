@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { buttonClassName } from "./Button";
 import { PosterActions } from "./PosterActions";
@@ -15,6 +15,8 @@ import {
 } from "@/lib/testState";
 
 export function PosterPageContent() {
+  const posterExportRef = useRef<HTMLDivElement>(null);
+  const posterPreviewRef = useRef<HTMLDivElement>(null);
   const [result, setResult] = useState<TestResult | null>(null);
   const [hydrated, setHydrated] = useState(false);
 
@@ -61,13 +63,26 @@ export function PosterPageContent() {
         <div
           className="mx-auto h-[396px] w-[297px] overflow-hidden rounded-[18px] min-[410px]:h-[444px] min-[410px]:w-[333px] min-[460px]:h-[504px] min-[460px]:w-[378px]"
           data-testid="poster-preview"
+          ref={posterPreviewRef}
         >
           <div className="origin-top-left scale-[0.33] min-[410px]:scale-[0.37] min-[460px]:scale-[0.42]">
             <ResultPoster result={result} />
           </div>
         </div>
       </div>
-      <PosterActions result={result} />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed left-[-10000px] top-0"
+        style={{
+          height: 1200,
+          width: 900,
+        }}
+      >
+        <div ref={posterExportRef}>
+          <ResultPoster result={result} />
+        </div>
+      </div>
+      <PosterActions posterRef={posterExportRef} result={result} />
       <div className="flex gap-3">
         <Link className={buttonClassName("secondary", "flex-1")} href="/result">
           返回结果

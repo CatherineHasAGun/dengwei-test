@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-label="登味浓度测试">
+  <defs>
+    <linearGradient id="g" x1="18" x2="162" y1="18" y2="162" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff6b9d"/>
+      <stop offset="1" stop-color="#ffd166"/>
+    </linearGradient>
+  </defs>
+  <rect width="180" height="180" rx="42" fill="url(#g)"/>
+  <text x="90" y="113" fill="#fff" font-family="Arial, sans-serif" font-size="92" font-weight="900" text-anchor="middle">D</text>
+</svg>

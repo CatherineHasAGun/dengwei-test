@@ -1,11 +1,11 @@
 import {
   DIMENSION_KEYS,
   dimensionLabels,
-  type DimensionScores,
+  type NormalizedDimensionScores,
 } from "@/lib/questions";
 
 type DimensionBreakdownProps = {
-  dimensions: DimensionScores;
+  dimensions: NormalizedDimensionScores;
 };
 
 export function DimensionBreakdown({ dimensions }: DimensionBreakdownProps) {

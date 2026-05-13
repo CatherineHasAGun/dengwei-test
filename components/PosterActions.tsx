@@ -1,16 +1,24 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { type RefObject, useState } from "react";
 import Image from "next/image";
 import { trackEvent } from "@/lib/analytics";
 import type { TestResult } from "@/lib/scoring";
 import { copyTextToClipboard } from "@/lib/clipboard";
 import { Button } from "./Button";
-import { ResultPoster } from "./ResultPoster";
 
 type PosterActionsProps = {
+  posterRef: RefObject<HTMLDivElement | null>;
   result: TestResult;
 };
+
+const EXPORT_HEIGHT = 2400;
+const EXPORT_WIDTH = 1800;
+
+const waitForLayoutFrame = () =>
+  new Promise<void>((resolve) => {
+    window.requestAnimationFrame(() => resolve());
+  });
 
 const shareItems = [
   {
@@ -22,27 +30,49 @@ const shareItems = [
   { eventName: "click_copy_weibo", key: "weiboCopy", label: "微博文案" },
 ] as const;
 
-export function PosterActions({ result }: PosterActionsProps) {
-  const posterRef = useRef<HTMLDivElement>(null);
+export function PosterActions({ posterRef, result }: PosterActionsProps) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
 
   async function handleSavePoster() {
-    if (!posterRef.current || saving) return;
+    const posterElement = posterRef.current;
+
+    if (!posterElement || saving) return;
 
     setSaving(true);
     setSaved(false);
 
     try {
+      await document.fonts.ready;
+      await waitForLayoutFrame();
+      await waitForLayoutFrame();
+
+      const posterRect = posterElement.getBoundingClientRect();
+      const posterHeight = Math.ceil(posterRect.height);
+      const posterWidth = Math.ceil(posterRect.width);
+      const exportScale = EXPORT_WIDTH / posterWidth;
       const html2canvas = (await import("html2canvas")).default;
-      const canvas = await html2canvas(posterRef.current, {
+      const capturedCanvas = await html2canvas(posterElement, {
         backgroundColor: null,
+        height: posterHeight,
         logging: false,
-        scale: 2,
+        scale: exportScale,
+        scrollX: 0,
+        scrollY: 0,
         useCORS: true,
+        width: posterWidth,
+        windowHeight: Math.max(document.documentElement.clientHeight, posterHeight),
+        windowWidth: Math.max(document.documentElement.clientWidth, posterWidth),
       });
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+
+      canvas.height = EXPORT_HEIGHT;
+      canvas.width = EXPORT_WIDTH;
+      context?.drawImage(capturedCanvas, 0, 0, EXPORT_WIDTH, EXPORT_HEIGHT);
+
       const link = document.createElement("a");
       const imageUrl = canvas.toDataURL("image/png");
       link.download = "登味浓度测试结果.png";
@@ -110,14 +140,6 @@ export function PosterActions({ result }: PosterActionsProps) {
           </a>
         </div>
       ) : null}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none fixed left-[-10000px] top-0"
-      >
-        <div ref={posterRef}>
-          <ResultPoster result={result} />
-        </div>
-      </div>
     </section>
   );
 }

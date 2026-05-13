@@ -1,13 +1,21 @@
-import type { DimensionKey, DimensionScores } from "./questions";
+import type {
+  DimensionKey,
+  NormalizedDimensionScores,
+  ResultAffinity,
+  ResultTypeId,
+} from "./questions";
 import type { Answer } from "./scoring";
-import type { ResultTypeId } from "./results";
 
 export const TEST_STATE_STORAGE_KEY = "dengwei-test-state-v1";
 
 export type StoredResult = {
   totalScore: number;
-  dimensions: DimensionScores;
+  dimensions: NormalizedDimensionScores;
+  socialDesirabilityIndex?: number;
   dominantDimension: DimensionKey;
+  dominantAffinity?: ResultTypeId;
+  affinityScores?: ResultAffinity;
+  highDimensionCount?: number;
   resultType: ResultTypeId;
 };
 

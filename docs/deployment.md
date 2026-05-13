@@ -34,6 +34,25 @@ npm run build
 6. Bind the custom domain.
 7. Re-run a quick smoke test on mobile and desktop.
 
+## GitHub Pages Steps
+
+GitHub Pages can only host static files, so this project uses a dedicated
+static export build for Pages.
+
+1. Commit and push the GitHub Pages workflow and static export config.
+2. Merge the changes into `master`.
+3. Open the repository on GitHub.
+4. Go to Settings -> Pages.
+5. Set Source to GitHub Actions.
+6. Run the "Deploy GitHub Pages" workflow, or push to `master`.
+7. Visit `https://catherinehasagun.github.io/dengwei-test/`.
+
+The GitHub Pages build command is:
+
+```bash
+npm run build:github-pages
+```
+
 ## Environment Variables
 
 ```bash
@@ -61,5 +80,5 @@ This value is used by SEO metadata, `robots.txt`, and `sitemap.xml`.
 - Share copy buttons work.
 - `/poster` renders a result card.
 - Save result card generates an image preview and download.
-- `robots.txt`, `sitemap.xml`, `manifest.webmanifest`, `/icon`, and
-  `/apple-icon` are available.
+- `robots.txt`, `sitemap.xml`, `manifest.webmanifest`, and `icon.svg` are
+  available.

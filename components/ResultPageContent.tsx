@@ -52,9 +52,13 @@ export function ResultPageContent() {
         JSON.stringify({
           ...storedState,
           result: {
+            affinityScores: calculatedResult.affinityScores,
             dimensions: calculatedResult.dimensions,
+            dominantAffinity: calculatedResult.dominantAffinity,
             dominantDimension: calculatedResult.dominantDimension,
+            highDimensionCount: calculatedResult.highDimensionCount,
             resultType: calculatedResult.resultType,
+            socialDesirabilityIndex: calculatedResult.socialDesirabilityIndex,
             totalScore: calculatedResult.totalScore,
           },
         } satisfies TestState),

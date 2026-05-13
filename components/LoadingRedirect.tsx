@@ -43,9 +43,13 @@ export function LoadingRedirect() {
       JSON.stringify({
         ...storedState,
         result: {
+          affinityScores: result.affinityScores,
           dimensions: result.dimensions,
+          dominantAffinity: result.dominantAffinity,
           dominantDimension: result.dominantDimension,
+          highDimensionCount: result.highDimensionCount,
           resultType: result.resultType,
+          socialDesirabilityIndex: result.socialDesirabilityIndex,
           totalScore: result.totalScore,
         },
       } satisfies TestState),

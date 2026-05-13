@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:github-pages": "GITHUB_PAGES=true NEXT_PUBLIC_BASE_PATH=/dengwei-test NEXT_PUBLIC_SITE_URL=https://CatherineHasAGun.github.io/dengwei-test next build",
     "preflight": "npm run typecheck && npm run build",
     "start": "next start",
     "typecheck": "tsc --noEmit"

@@ -1,13 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import { RouteTracker } from "@/components/RouteTracker";
+import { siteUrl, withBasePath } from "@/lib/site";
 import "./globals.css";
 
-const siteUrl = new URL(
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://dengwei-test.vercel.app",
-);
+const metadataBase = new URL(siteUrl);
 
 export const metadata: Metadata = {
-  metadataBase: siteUrl,
+  metadataBase,
   title: {
     default: "登味浓度测试",
     template: "%s | 登味浓度测试",
@@ -29,6 +28,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  icons: {
+    apple: withBasePath("/icon.svg"),
+    icon: withBasePath("/icon.svg"),
+  },
+  manifest: withBasePath("/manifest.webmanifest"),
   openGraph: {
     title: "登味浓度测试",
     description: "测测你的表达方式是不是先退休了。",

@@ -11,12 +11,12 @@ import {
 } from "recharts";
 import {
   DIMENSION_KEYS,
-  type DimensionScores,
   type DimensionKey,
+  type NormalizedDimensionScores,
 } from "@/lib/questions";
 
 type RadarChartProps = {
-  dimensions: DimensionScores;
+  dimensions: NormalizedDimensionScores;
 };
 
 const radarLabels: Record<DimensionKey, string> = {
@@ -43,7 +43,12 @@ export function RadarChart({ dimensions }: RadarChartProps) {
       <h2 className="text-lg font-black text-ink">五维雷达图</h2>
       <div className="mt-4 h-72 w-full">
         {mounted ? (
-          <ResponsiveContainer height="100%" width="100%">
+          <ResponsiveContainer
+            height="100%"
+            minHeight={288}
+            minWidth={0}
+            width="100%"
+          >
             <RechartsRadarChart
               data={data}
               margin={{ bottom: 18, left: 36, right: 36, top: 18 }}

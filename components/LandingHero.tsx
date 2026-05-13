@@ -19,7 +19,7 @@ export function LandingHero() {
           登味浓度测试
         </p>
         <h1 className="mt-5 text-5xl font-black leading-[1.05] text-ink">
-          测测你的表达方式是不是先退休了
+          测测你的登味浓度超标了吗?
         </h1>
         <p className="mt-5 text-base leading-7 text-ink/72">
           登味不是年龄，而是一种社交表达方式。你是清爽人类，还是会议室老登？
