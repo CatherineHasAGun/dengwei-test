@@ -9,22 +9,22 @@ import { trackEvent } from "@/lib/analytics";
 import { questions } from "@/lib/questions";
 import {
   clampQuestionIndex,
+  clearTestState,
   getAnswerForQuestion,
   hasCompletedTest,
   initialTestState,
-  parseTestState,
-  TEST_STATE_STORAGE_KEY,
+  persistTestState,
+  readTestState,
   type TestState,
   upsertAnswer,
 } from "@/lib/testState";
 
 function readStoredState(): TestState {
-  const storedValue = window.localStorage.getItem(TEST_STATE_STORAGE_KEY);
-  return parseTestState(storedValue, questions.length);
+  return readTestState(questions.length);
 }
 
 function persistState(state: TestState) {
-  window.localStorage.setItem(TEST_STATE_STORAGE_KEY, JSON.stringify(state));
+  persistTestState(state);
 }
 
 export function TestFlow() {
@@ -114,7 +114,7 @@ export function TestFlow() {
       clearTimeout(advanceTimerRef.current);
     }
 
-    window.localStorage.removeItem(TEST_STATE_STORAGE_KEY);
+    clearTestState();
     setState(initialTestState);
     trackEvent("click_restart");
   }

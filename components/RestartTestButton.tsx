@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "./Button";
 import type { ButtonHTMLAttributes, MouseEvent } from "react";
 import { trackEvent } from "@/lib/analytics";
-import { TEST_STATE_STORAGE_KEY } from "@/lib/testState";
+import { clearTestState } from "@/lib/testState";
 
 type RestartTestButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: "primary" | "secondary" | "ghost";
@@ -18,7 +18,7 @@ export function RestartTestButton({
   const router = useRouter();
 
   function handleClick(event: MouseEvent<HTMLButtonElement>) {
-    window.localStorage.removeItem(TEST_STATE_STORAGE_KEY);
+    clearTestState();
     trackEvent("click_restart");
     onClick?.(event);
     router.push("/test");

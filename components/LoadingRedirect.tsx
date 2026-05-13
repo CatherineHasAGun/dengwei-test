@@ -10,8 +10,8 @@ import { questions } from "@/lib/questions";
 import { calculateTestResult, type TestResult } from "@/lib/scoring";
 import {
   hasCompletedTest,
-  parseTestState,
-  TEST_STATE_STORAGE_KEY,
+  persistTestState,
+  readTestState,
   type TestState,
 } from "@/lib/testState";
 
@@ -21,8 +21,7 @@ export function LoadingRedirect() {
   const delay = useMemo(() => 2200 + Math.round(Math.random() * 700), []);
 
   useEffect(() => {
-    const storedValue = window.localStorage.getItem(TEST_STATE_STORAGE_KEY);
-    const storedState = parseTestState(storedValue, questions.length);
+    const storedState = readTestState(questions.length);
     const completed = hasCompletedTest(storedState.answers, questions.length);
 
     setIsComplete(completed);
@@ -38,22 +37,19 @@ export function LoadingRedirect() {
       return;
     }
 
-    window.localStorage.setItem(
-      TEST_STATE_STORAGE_KEY,
-      JSON.stringify({
-        ...storedState,
-        result: {
-          affinityScores: result.affinityScores,
-          dimensions: result.dimensions,
-          dominantAffinity: result.dominantAffinity,
-          dominantDimension: result.dominantDimension,
-          highDimensionCount: result.highDimensionCount,
-          resultType: result.resultType,
-          socialDesirabilityIndex: result.socialDesirabilityIndex,
-          totalScore: result.totalScore,
-        },
-      } satisfies TestState),
-    );
+    persistTestState({
+      ...storedState,
+      result: {
+        affinityScores: result.affinityScores,
+        dimensions: result.dimensions,
+        dominantAffinity: result.dominantAffinity,
+        dominantDimension: result.dominantDimension,
+        highDimensionCount: result.highDimensionCount,
+        resultType: result.resultType,
+        socialDesirabilityIndex: result.socialDesirabilityIndex,
+        totalScore: result.totalScore,
+      },
+    } satisfies TestState);
     trackEventOnce(
       `complete_test:${storedState.answers.map((answer) => `${answer.questionId}-${answer.optionId}`).join("|")}`,
       "complete_test",

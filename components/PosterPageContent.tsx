@@ -10,8 +10,7 @@ import { questions } from "@/lib/questions";
 import { calculateTestResult, type TestResult } from "@/lib/scoring";
 import {
   hasCompletedTest,
-  parseTestState,
-  TEST_STATE_STORAGE_KEY,
+  readTestState,
 } from "@/lib/testState";
 
 export function PosterPageContent() {
@@ -21,8 +20,7 @@ export function PosterPageContent() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    const storedValue = window.localStorage.getItem(TEST_STATE_STORAGE_KEY);
-    const storedState = parseTestState(storedValue, questions.length);
+    const storedState = readTestState(questions.length);
 
     if (hasCompletedTest(storedState.answers, questions.length)) {
       try {

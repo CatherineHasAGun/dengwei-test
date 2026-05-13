@@ -14,8 +14,8 @@ import { questions } from "@/lib/questions";
 import { calculateTestResult, type TestResult } from "@/lib/scoring";
 import {
   hasCompletedTest,
-  parseTestState,
-  TEST_STATE_STORAGE_KEY,
+  persistTestState,
+  readTestState,
   type TestState,
 } from "@/lib/testState";
 
@@ -24,8 +24,7 @@ export function ResultPageContent() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    const storedValue = window.localStorage.getItem(TEST_STATE_STORAGE_KEY);
-    const storedState = parseTestState(storedValue, questions.length);
+    const storedState = readTestState(questions.length);
 
     if (hasCompletedTest(storedState.answers, questions.length)) {
       let calculatedResult: TestResult;
@@ -47,22 +46,19 @@ export function ResultPageContent() {
         },
       );
 
-      window.localStorage.setItem(
-        TEST_STATE_STORAGE_KEY,
-        JSON.stringify({
-          ...storedState,
-          result: {
-            affinityScores: calculatedResult.affinityScores,
-            dimensions: calculatedResult.dimensions,
-            dominantAffinity: calculatedResult.dominantAffinity,
-            dominantDimension: calculatedResult.dominantDimension,
-            highDimensionCount: calculatedResult.highDimensionCount,
-            resultType: calculatedResult.resultType,
-            socialDesirabilityIndex: calculatedResult.socialDesirabilityIndex,
-            totalScore: calculatedResult.totalScore,
-          },
-        } satisfies TestState),
-      );
+      persistTestState({
+        ...storedState,
+        result: {
+          affinityScores: calculatedResult.affinityScores,
+          dimensions: calculatedResult.dimensions,
+          dominantAffinity: calculatedResult.dominantAffinity,
+          dominantDimension: calculatedResult.dominantDimension,
+          highDimensionCount: calculatedResult.highDimensionCount,
+          resultType: calculatedResult.resultType,
+          socialDesirabilityIndex: calculatedResult.socialDesirabilityIndex,
+          totalScore: calculatedResult.totalScore,
+        },
+      } satisfies TestState);
     }
 
     setHydrated(true);

@@ -30,6 +30,40 @@ export const initialTestState: TestState = {
   answers: [],
 };
 
+function readStorage(storage: Storage | undefined) {
+  try {
+    return storage?.getItem(TEST_STATE_STORAGE_KEY) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function removeFromStorage(storage: Storage | undefined) {
+  try {
+    storage?.removeItem(TEST_STATE_STORAGE_KEY);
+  } catch {
+    // Storage may be unavailable in some in-app browsers.
+  }
+}
+
+function writeStorage(storage: Storage | undefined, state: TestState) {
+  try {
+    storage?.setItem(TEST_STATE_STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // If storage is blocked, the test still works for the current render cycle.
+  }
+}
+
+function getSessionStorage() {
+  if (typeof window === "undefined") return undefined;
+  return window.sessionStorage;
+}
+
+function getLocalStorage() {
+  if (typeof window === "undefined") return undefined;
+  return window.localStorage;
+}
+
 function isStoredAnswer(value: unknown): value is Answer {
   if (!value || typeof value !== "object") return false;
 
@@ -95,4 +129,17 @@ export function upsertAnswer(
 
 export function hasCompletedTest(answers: Answer[], totalQuestions: number) {
   return answers.length === totalQuestions;
+}
+
+export function readTestState(totalQuestions: number): TestState {
+  return parseTestState(readStorage(getSessionStorage()), totalQuestions);
+}
+
+export function persistTestState(state: TestState) {
+  writeStorage(getSessionStorage(), state);
+}
+
+export function clearTestState() {
+  removeFromStorage(getSessionStorage());
+  removeFromStorage(getLocalStorage());
 }

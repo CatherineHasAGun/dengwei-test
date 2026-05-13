@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { questions } from "@/lib/questions";
 import { trackEvent } from "@/lib/analytics";
+import { clearTestState } from "@/lib/testState";
 import { buttonClassName } from "./Button";
 
 const stats = [
@@ -12,6 +14,15 @@ const stats = [
 ];
 
 export function LandingHero() {
+  useEffect(() => {
+    clearTestState();
+  }, []);
+
+  function handleStartTest() {
+    clearTestState();
+    trackEvent("click_start_test");
+  }
+
   return (
     <section className="px-5 pb-10 pt-8">
       <div className="mx-auto w-full max-w-[480px]">
@@ -36,7 +47,7 @@ export function LandingHero() {
           <Link
             className={buttonClassName("primary", "w-full")}
             href="/test"
-            onClick={() => trackEvent("click_start_test")}
+            onClick={handleStartTest}
           >
             开始测试
           </Link>
