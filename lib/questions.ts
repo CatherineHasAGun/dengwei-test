@@ -13,21 +13,21 @@ export type {
 
 export const dimensionLabels: Record<DimensionKey, string> = {
   experiencePressure: "经验压迫感",
-  controlBoundary: "控制欲与边界感缺失",
-  cognitiveRigidity: "认知僵化",
-  empathyDeficit: "共情与倾听不足",
+  controlBoundary: "边界感与控制感",
+  cognitiveRigidity: "开放度不足",
+  empathyDeficit: "共情倾听不足",
   judgmentalSuperiority: "评价欲与优越感",
 };
 
 export const dimensionExplanations: Record<DimensionKey, string> = {
   experiencePressure:
-    "你最明显的登味来源是经验压迫感。你容易觉得自己已经看过这集，所以忍不住提前剧透别人的人生。",
+    "你最明显的登味来源是经验压迫感。你容易觉得自己已经看过这集，于是忍不住提前给别人剧透人生。",
   controlBoundary:
-    "你最明显的登味来源是控制欲与边界感缺失。你常常是出于关心，但表达出来容易像是在接管别人的人生。",
+    "你最明显的登味来源是边界感与控制感。你常常是出于关心，但表达出来容易像是在接管别人的人生。",
   cognitiveRigidity:
-    "你最明显的登味来源是认知僵化。面对新东西时，你容易先皱眉，再理解。",
+    "你最明显的登味来源是开放度不足。面对新东西时，你容易先皱眉，再理解。",
   empathyDeficit:
-    "你最明显的登味来源是共情与倾听不足。别人只是想被听见时，你可能已经开始准备解决方案。",
+    "你最明显的登味来源是共情倾听不足。别人只是想被听见时，你可能已经开始准备解决方案。",
   judgmentalSuperiority:
     "你最明显的登味来源是评价欲与优越感。你不一定真的看不起别人，但你的内心弹幕常常很会打分。",
 };

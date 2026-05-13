@@ -19,18 +19,17 @@ const waitForLayoutFrame = () =>
     window.requestAnimationFrame(() => resolve());
   });
 
-function isWeChatBrowser() {
-  return /MicroMessenger/i.test(window.navigator.userAgent);
-}
+function canvasToBlob(canvas: HTMLCanvasElement) {
+  return new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) {
+        resolve(blob);
+        return;
+      }
 
-function triggerImageDownload(imageUrl: string) {
-  const link = document.createElement("a");
-
-  link.download = "登味浓度测试结果.png";
-  link.href = imageUrl;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
+      reject(new Error("Poster image export failed."));
+    }, "image/png");
+  });
 }
 
 const shareItems = [
@@ -50,6 +49,14 @@ export function PosterActions({ posterRef, result }: PosterActionsProps) {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (generatedImageUrl?.startsWith("blob:")) {
+        URL.revokeObjectURL(generatedImageUrl);
+      }
+    };
+  }, [generatedImageUrl]);
 
   useEffect(() => {
     if (!generatedImageUrl) return;
@@ -104,12 +111,9 @@ export function PosterActions({ posterRef, result }: PosterActionsProps) {
       canvas.width = EXPORT_WIDTH;
       context?.drawImage(capturedCanvas, 0, 0, EXPORT_WIDTH, EXPORT_HEIGHT);
 
-      const imageUrl = canvas.toDataURL("image/png");
+      const imageBlob = await canvasToBlob(canvas);
+      const imageUrl = URL.createObjectURL(imageBlob);
       setGeneratedImageUrl(imageUrl);
-
-      if (!isWeChatBrowser()) {
-        triggerImageDownload(imageUrl);
-      }
 
       setSaved(true);
       trackEvent("click_save_poster", {
@@ -137,7 +141,7 @@ export function PosterActions({ posterRef, result }: PosterActionsProps) {
       <h2 className="text-lg font-black text-ink">保存和分享</h2>
       <div className="mt-4 space-y-3">
         <Button className="w-full" disabled={saving} onClick={handleSavePoster}>
-          {saving ? "正在生成图片" : saved ? "重新生成图片" : "保存结果卡"}
+          {saving ? "正在生成图片" : saved ? "重新生成长按图片" : "生成长按保存图片"}
         </Button>
         {saveError ? (
           <p className="rounded-2xl bg-peach/10 px-4 py-3 text-xs font-bold leading-5 text-peach">
@@ -160,16 +164,17 @@ export function PosterActions({ posterRef, result }: PosterActionsProps) {
       {generatedImageUrl ? (
         <div className="mt-5 rounded-2xl bg-cream p-3" ref={generatedImageRef}>
           <p className="px-1 text-xs font-bold leading-5 text-ink/60">
-            图片已生成。微信里请长按下方图片保存到手机。
+            图片已生成。请长按下方图片，选择保存图片或保存到相册。
           </p>
           <div className="mt-3 overflow-hidden rounded-2xl border border-white bg-white">
             <img
               alt="登味浓度测试结果卡"
-              className="h-auto w-full select-auto"
+              className="block h-auto w-full select-auto"
               data-testid="generated-poster-image"
               src={generatedImageUrl}
               style={{
                 WebkitTouchCallout: "default",
+                WebkitUserSelect: "auto",
                 userSelect: "auto",
               }}
             />

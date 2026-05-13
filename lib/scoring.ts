@@ -46,6 +46,14 @@ const SCORE_WEIGHTS: Record<DimensionKey, number> = {
   judgmentalSuperiority: 0.15,
 };
 
+const SCORE_BANDS = {
+  freshMax: 20,
+  mildMax: 40,
+  moderateMax: 55,
+  heavyMax: 75,
+  highMax: 88,
+} as const;
+
 const emptyDimensionScores = (): DimensionScores => ({
   experiencePressure: 0,
   controlBoundary: 0,
@@ -184,52 +192,27 @@ export function getFinalResultType(params: {
     totalScore,
     dominantDimension,
     dominantAffinity,
-    highDimensionCount,
   } = params;
 
-  if (totalScore >= 89) return "ancestralElder";
+  if (totalScore <= SCORE_BANDS.freshMax) return "freshHuman";
 
-  if (totalScore >= 82 && highDimensionCount >= 3) return "ancestralElder";
+  if (totalScore <= SCORE_BANDS.mildMax) {
+    return "occasionalLecturer";
+  }
 
-  if (totalScore <= 22) return "freshHuman";
-
-  if (totalScore <= 38) {
-    if (dominantAffinity === "freshHuman") return "freshHuman";
+  if (totalScore <= SCORE_BANDS.moderateMax) {
     if (dominantAffinity === "experienceTeacher") return "experienceTeacher";
     if (dominantAffinity === "boundaryMissing") return "boundaryMissing";
     if (dominantAffinity === "internetFrowner") return "internetFrowner";
-    if (dominantAffinity === "meetingRoomElder") return "meetingRoomElder";
-    if (dominantAffinity === "forYourOwnGoodController") {
-      return "forYourOwnGoodController";
-    }
-    if (dominantAffinity === "ancestralElder") return "experienceTeacher";
-
-    return "occasionalLecturer";
-  }
-
-  if (totalScore <= 58) {
-    if (
-      dominantAffinity === "experienceTeacher" ||
-      dominantAffinity === "boundaryMissing" ||
-      dominantAffinity === "internetFrowner" ||
-      dominantAffinity === "meetingRoomElder" ||
-      dominantAffinity === "forYourOwnGoodController" ||
-      dominantAffinity === "occasionalLecturer"
-    ) {
-      return dominantAffinity;
-    }
-
-    if (dominantAffinity === "ancestralElder") return "experienceTeacher";
-
     if (dominantDimension === "experiencePressure") return "experienceTeacher";
     if (dominantDimension === "controlBoundary") return "boundaryMissing";
     if (dominantDimension === "cognitiveRigidity") return "internetFrowner";
-    if (dominantDimension === "empathyDeficit") return "occasionalLecturer";
+    if (dominantDimension === "judgmentalSuperiority") return "internetFrowner";
 
     return "occasionalLecturer";
   }
 
-  if (totalScore <= 75) {
+  if (totalScore <= SCORE_BANDS.heavyMax) {
     if (
       dominantAffinity === "meetingRoomElder" ||
       dominantAffinity === "forYourOwnGoodController" ||
@@ -253,7 +236,7 @@ export function getFinalResultType(params: {
     return "meetingRoomElder";
   }
 
-  if (totalScore <= 88) {
+  if (totalScore <= SCORE_BANDS.highMax) {
     if (dominantAffinity === "meetingRoomElder") return "meetingRoomElder";
 
     if (dominantAffinity === "forYourOwnGoodController") {

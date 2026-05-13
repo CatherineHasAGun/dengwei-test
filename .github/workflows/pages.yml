@@ -3,7 +3,7 @@ name: Deploy GitHub Pages
 on:
   push:
     branches:
-      - codex/mvp-production-ready
+      - master
   workflow_dispatch:
 
 permissions:
