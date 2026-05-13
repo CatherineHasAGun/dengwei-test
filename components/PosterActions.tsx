@@ -1,7 +1,6 @@
 "use client";
 
-import { type RefObject, useState } from "react";
-import Image from "next/image";
+import { type RefObject, useEffect, useRef, useState } from "react";
 import { trackEvent } from "@/lib/analytics";
 import type { TestResult } from "@/lib/scoring";
 import { copyTextToClipboard } from "@/lib/clipboard";
@@ -20,6 +19,20 @@ const waitForLayoutFrame = () =>
     window.requestAnimationFrame(() => resolve());
   });
 
+function isWeChatBrowser() {
+  return /MicroMessenger/i.test(window.navigator.userAgent);
+}
+
+function triggerImageDownload(imageUrl: string) {
+  const link = document.createElement("a");
+
+  link.download = "登味浓度测试结果.png";
+  link.href = imageUrl;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
 const shareItems = [
   {
     eventName: "click_copy_xiaohongshu",
@@ -31,10 +44,25 @@ const shareItems = [
 ] as const;
 
 export function PosterActions({ posterRef, result }: PosterActionsProps) {
+  const generatedImageRef = useRef<HTMLDivElement>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!generatedImageUrl) return;
+
+    const timer = window.setTimeout(() => {
+      generatedImageRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 80);
+
+    return () => window.clearTimeout(timer);
+  }, [generatedImageUrl]);
 
   async function handleSavePoster() {
     const posterElement = posterRef.current;
@@ -43,9 +71,12 @@ export function PosterActions({ posterRef, result }: PosterActionsProps) {
 
     setSaving(true);
     setSaved(false);
+    setSaveError(null);
 
     try {
-      await document.fonts.ready;
+      if ("fonts" in document) {
+        await document.fonts.ready;
+      }
       await waitForLayoutFrame();
       await waitForLayoutFrame();
 
@@ -73,17 +104,20 @@ export function PosterActions({ posterRef, result }: PosterActionsProps) {
       canvas.width = EXPORT_WIDTH;
       context?.drawImage(capturedCanvas, 0, 0, EXPORT_WIDTH, EXPORT_HEIGHT);
 
-      const link = document.createElement("a");
       const imageUrl = canvas.toDataURL("image/png");
-      link.download = "登味浓度测试结果.png";
-      link.href = imageUrl;
       setGeneratedImageUrl(imageUrl);
-      link.click();
+
+      if (!isWeChatBrowser()) {
+        triggerImageDownload(imageUrl);
+      }
+
       setSaved(true);
       trackEvent("click_save_poster", {
         resultType: result.resultType,
         totalScore: result.totalScore,
       });
+    } catch {
+      setSaveError("图片生成失败，请刷新页面后再试一次。");
     } finally {
       setSaving(false);
     }
@@ -103,8 +137,13 @@ export function PosterActions({ posterRef, result }: PosterActionsProps) {
       <h2 className="text-lg font-black text-ink">保存和分享</h2>
       <div className="mt-4 space-y-3">
         <Button className="w-full" disabled={saving} onClick={handleSavePoster}>
-          {saving ? "正在生成图片" : saved ? "已生成图片" : "保存结果卡"}
+          {saving ? "正在生成图片" : saved ? "重新生成图片" : "保存结果卡"}
         </Button>
+        {saveError ? (
+          <p className="rounded-2xl bg-peach/10 px-4 py-3 text-xs font-bold leading-5 text-peach">
+            {saveError}
+          </p>
+        ) : null}
         <div className="grid grid-cols-1 gap-3">
           {shareItems.map((item) => (
             <Button
@@ -119,25 +158,22 @@ export function PosterActions({ posterRef, result }: PosterActionsProps) {
         </div>
       </div>
       {generatedImageUrl ? (
-        <div className="mt-5 rounded-2xl bg-cream p-3">
+        <div className="mt-5 rounded-2xl bg-cream p-3" ref={generatedImageRef}>
           <p className="px-1 text-xs font-bold leading-5 text-ink/60">
-            图片已生成。如果当前浏览器没有自动下载，可以打开图片后长按保存。
+            图片已生成。微信里请长按下方图片保存到手机。
           </p>
-          <a
-            className="mt-3 block overflow-hidden rounded-2xl border border-white bg-white"
-            download="登味浓度测试结果.png"
-            href={generatedImageUrl}
-            target="_blank"
-          >
-            <Image
+          <div className="mt-3 overflow-hidden rounded-2xl border border-white bg-white">
+            <img
               alt="登味浓度测试结果卡"
-              className="h-auto w-full"
-              height={1200}
+              className="h-auto w-full select-auto"
+              data-testid="generated-poster-image"
               src={generatedImageUrl}
-              unoptimized
-              width={900}
+              style={{
+                WebkitTouchCallout: "default",
+                userSelect: "auto",
+              }}
             />
-          </a>
+          </div>
         </div>
       ) : null}
     </section>

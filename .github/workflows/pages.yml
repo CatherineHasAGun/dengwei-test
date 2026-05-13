@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - codex/mvp-production-ready
   workflow_dispatch:
 
 permissions:
